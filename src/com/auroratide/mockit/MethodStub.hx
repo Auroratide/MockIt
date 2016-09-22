@@ -38,18 +38,18 @@ class MethodStub<T> {
         returnArray.push(Always(returnArray[returnArray.length - 1]));
     }
 
-    public function next(args:Arguments):T {
-        if(!returns.exists(args) || returns.get(args).length <= 0)
+    public function next(args:Array<Dynamic>):T {
+        if(!returns.exists(args) || returns.find(args).length <= 0)
             return null;
 
-        var returnArray = returns.get(args);
+        var returnArray = returns.find(args);
         switch(returnArray[0]) {
             case Value(v): returnArray.shift(); return v;
             case Error(e): returnArray.shift(); throw e;
-            case Action(f): returnArray.shift(); return f(args.toArray());
+            case Action(f): returnArray.shift(); return f(args);
             case Always(Value(v)): return v;
             case Always(Error(e)): throw e;
-            case Always(Action(f)): return f(args.toArray());
+            case Always(Action(f)): return f(args);
             case Always(Always(_)): return null;
         }
     }
@@ -63,7 +63,7 @@ private enum ReturnType<T> {
     Always(r:ReturnType<T>);
 }
 
-private class ArgumentsMap<T> implements IMap<Arguments, Array<ReturnType<T>>> {
+private class ArgumentsMap<T> {
 
     private var keys_:Array<Arguments>;
     private var values_:Array<Array<ReturnType<T>>>;
@@ -73,8 +73,12 @@ private class ArgumentsMap<T> implements IMap<Arguments, Array<ReturnType<T>>> {
         values_ = new Array<Array<ReturnType<T>>>();
     }
 
-    public function get(k:Arguments):Null<Array<ReturnType<T>>> {
-        return values_[find(k)];
+    public function get(k:Arguments):Array<ReturnType<T>> {
+        return values_[keys_.indexOf(k)];
+    }
+
+    public function find(k:Array<Dynamic>):Array<ReturnType<T>> {
+        return values_[findIndex(k)];
     }
 
     public function create(k:Arguments):Void {
@@ -93,14 +97,8 @@ private class ArgumentsMap<T> implements IMap<Arguments, Array<ReturnType<T>>> {
         }
     }
 
-    public function exists(k:Arguments):Bool {
-        return find(k) >= 0;
-    }
-
-    public function remove(k:Arguments):Bool {
-        var success = true;
-        success = success && values_.remove(get(k));
-        return keys_.remove(k) && success;
+    public function exists(k:Array<Dynamic>):Bool {
+        return findIndex(k) >= 0;
     }
 
     public function keys():Iterator<Arguments> {
@@ -112,13 +110,13 @@ private class ArgumentsMap<T> implements IMap<Arguments, Array<ReturnType<T>>> {
     }
 
     public function toString():String {
-        return "{ArrayMap}";
+        return "{ArgumentsMap}";
     }
 
-    private function find(k:Arguments):Int {
+    private function findIndex(k:Array<Dynamic>):Int {
         var index = 0;
         for(key in keys()) {
-            if(k == key)
+            if(key == k)
                 return index;
             ++index;
         }

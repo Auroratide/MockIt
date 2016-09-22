@@ -6,19 +6,6 @@ package com.auroratide.mockit;
         this = new Array<Argument>();
     }
 
-    public function toArray():Array<Dynamic> {
-        var arr = new Array<Dynamic>();
-        for(arg in this) {
-            switch(arg) {
-                case Is(v): arr.push(v);
-                case Contains(v): arr.push([v]);
-                case Any: arr.push(null);
-            }
-        }
-
-        return arr;
-    }
-
     @:arrayAccess public inline function get(key:Int) {
         return this[key];
     }
@@ -28,7 +15,7 @@ package com.auroratide.mockit;
         return v;
     }
 
-    @:op(A == B) public static function equals(lhs:Arguments, rhs:Arguments):Bool {
+    @:op(A == B) public static function equals(lhs:Arguments, rhs:Array<Dynamic>):Bool {
         if(lhs.length != rhs.length)
             return false;
 
@@ -39,7 +26,7 @@ package com.auroratide.mockit;
         return true;
     }
 
-    @:op(A != B) public static function nequals(lhs:Arguments, rhs:Arguments):Bool {
+    @:op(A != B) public static function nequals(lhs:Arguments, rhs:Array<Dynamic>):Bool {
         return !(lhs == rhs);
     }
 
@@ -52,26 +39,16 @@ abstract Argument(ArgumentType) from ArgumentType to ArgumentType {
     }
 
     @:op(A == B)
-    public static function equals(lhs:Argument, rhs:Argument):Bool {
+    public static function equals(lhs:Argument, rhs:Dynamic):Bool {
         switch(lhs) {
-            case Any: return true;
-            case Contains(l):
-                switch(rhs) {
-                    case Any: return true;
-                    case Contains(r): return false;
-                    case Is(r): return Lambda.has(r, l);
-                }
-            case Is(l):
-                switch(rhs) {
-                    case Any: return true;
-                    case Contains(r): return Lambda.has(l, r);
-                    case Is(r): return l == r;
-                }
+            case Any:         return true;
+            case Contains(l): return Lambda.has(rhs, l);
+            case Is(l):       return l == rhs;
         }
     }
 
     @:op(A != B)
-    public static function nequals(lhs:Argument, rhs:Argument):Bool {
+    public static function nequals(lhs:Argument, rhs:Dynamic):Bool {
         return !(lhs == rhs);
     }
 

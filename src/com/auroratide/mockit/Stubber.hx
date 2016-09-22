@@ -14,7 +14,7 @@ class Stubber {
         return stub;
     }
 
-    public function next<T>(method:String, args:Arguments):T {
+    public function next<T>(method:String, args:Array<Dynamic>):T {
         if(!methods.exists(method))
             return null;
         return methods.get(method).next(args);

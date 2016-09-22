@@ -14,7 +14,7 @@ class MockIt {
         return verifier.called(method, args);
     }
 
-    public function call<T>(method:String, args:Arguments, ?defaultValue:T):T {
+    public function call<T>(method:String, args:Array<Dynamic>, ?defaultValue:T):T {
         verifier.call(method, args);
         var returnValue = stubber.next(method, args);
         return returnValue == null ? defaultValue : returnValue;
