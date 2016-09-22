@@ -40,3 +40,7 @@ enum Times {
     AtLeast(n:Int);
     AtMost(n:Int);
 }
+
+private typedef Mock = {
+    var mockit:MockIt;
+}

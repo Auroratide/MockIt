@@ -38,17 +38,19 @@ abstract Argument(ArgumentType) from ArgumentType to ArgumentType {
         return Is(obj);
     }
 
-    @:op(A == B)
-    public static function equals(lhs:Argument, rhs:Dynamic):Bool {
+    @:op(A == B) public static function equals(lhs:Argument, rhs:Dynamic):Bool {
         switch(lhs) {
-            case Any:         return true;
-            case Contains(l): return Lambda.has(rhs, l);
             case Is(l):       return l == rhs;
+            case IsNull:      return rhs == null;
+            case IsNotNull:   return rhs != null;
+            case Contains(l): return Lambda.has(rhs, l);
+            case Matches(r):  return r.match(rhs);
+            case ArgThat(f):  return f(rhs);
+            case Any:         return true;
         }
     }
 
-    @:op(A != B)
-    public static function nequals(lhs:Argument, rhs:Dynamic):Bool {
+    @:op(A != B) public static function nequals(lhs:Argument, rhs:Dynamic):Bool {
         return !(lhs == rhs);
     }
 
@@ -56,6 +58,10 @@ abstract Argument(ArgumentType) from ArgumentType to ArgumentType {
 
 enum ArgumentType {
     Is(value:Dynamic);
+    IsNull;
+    IsNotNull;
     Contains(value:Dynamic);
+    Matches(regex:EReg);
+    ArgThat(pred:Dynamic->Bool);
     Any;
 }

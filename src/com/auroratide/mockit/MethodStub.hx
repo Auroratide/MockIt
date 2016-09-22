@@ -1,7 +1,5 @@
 package com.auroratide.mockit;
 
-import haxe.Constraints.IMap;
-
 class MethodStub<T> {
 
     private var args:Arguments;
