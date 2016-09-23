@@ -2,3 +2,5 @@
 out/
 *.iml
 *.hxml
+Main.hx
+.DS_Store
